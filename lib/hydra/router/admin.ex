@@ -11,15 +11,18 @@ defmodule Hydra.Router.Admin do
   @endpoint_fields ["path", "description", "requests"]
   @request_fields ["url"]
 
-  plug Plug.Parsers, parsers: [:urlencoded, :json],
-                     pass:  ["text/*"],
-                     json_decoder: Poison
-  plug :match
-  plug :dispatch
+  plug(Plug.Parsers,
+    parsers: [:urlencoded, :json],
+    pass: ["text/*"],
+    json_decoder: Poison
+  )
 
-  post "/", do: new_endpoint(conn)
+  plug(:match)
+  plug(:dispatch)
 
-  match _, do: send_resp(conn, 404, "Oops!")
+  post("/", do: new_endpoint(conn))
+
+  match(_, do: send_resp(conn, 404, "Oops!"))
 
   defp new_endpoint(%Conn{body_params: params} = conn) do
     if request_valid?(params) do
@@ -30,20 +33,21 @@ defmodule Hydra.Router.Admin do
       |> Keyword.get(:name)
       |> Storage.insert(route)
 
-      Hydra.reload
+      Hydra.reload()
 
       send_resp(conn, 201, Poison.encode!(route))
     else
-      send_resp(conn, 400, invalid_request_error)
+      send_resp(conn, 400, invalid_request_error())
     end
   end
 
-  defp invalid_request_error, do: 100 |> Error.get_error |> Poison.encode!
+  defp invalid_request_error, do: 100 |> Error.get_error() |> Poison.encode!()
 
   defp create_route(params) do
-    reqs = params
-           |> Map.get("requests")
-           |> Enum.map(fn (req) -> new_struct(req, Request) end)
+    reqs =
+      params
+      |> Map.get("requests")
+      |> Enum.map(fn req -> new_struct(req, Request) end)
 
     params
     |> Map.put("requests", reqs)
@@ -55,6 +59,7 @@ defmodule Hydra.Router.Admin do
     |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
     |> new_struct(type)
   end
+
   defp new_struct(values, type) do
     struct(type, values)
   end
@@ -69,7 +74,7 @@ defmodule Hydra.Router.Admin do
 
   defp validate(params, fields) do
     params
-    |> Map.keys
+    |> Map.keys()
     |> valid_fields?(fields)
   end
 

@@ -16,7 +16,7 @@ defmodule Hydra.Router do
   get "/", do: send_resp(conn, 200, "Hi.")
   forward "/admin", to: Hydra.Router.Admin
 
-  dynamic_routes
+  Dynamic.dynamic_routes()
 
   match _, do: send_resp(conn, 404, "Oops!")
 end

@@ -9,9 +9,9 @@ defmodule Hydra.RouterTest do
 
   defmodule ExampleRouter do
     use Plug.Router
-    plug Plug.Parsers, parsers: [:urlencoded, :json],
+    plug(Plug.Parsers, parsers: [:urlencoded, :json],
                        pass:  ["text/*"],
-                       json_decoder: Poison
+                       json_decoder: Poison)
     plug :match
     plug :dispatch
 

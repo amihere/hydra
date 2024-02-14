@@ -5,14 +5,14 @@ defmodule Hydra do
 
   use Application
 
-  def main(args), do: Mix.Task.run "hydra", args
+  def main(args), do: Mix.Task.run("hydra", args)
 
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Hydra.Storage, [storage_opts]),
-      worker(Hydra.Server, [server_opts]),
+      worker(Hydra.Storage, [storage_opts()]),
+      worker(Hydra.Server, [server_opts()]),
       supervisor(Task.Supervisor, [[name: Hydra.TaskSupervisor]])
     ]
 
